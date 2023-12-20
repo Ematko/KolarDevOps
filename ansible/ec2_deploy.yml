@@ -103,14 +103,16 @@
           "tag:Environment": "Production"
           "tag:Name": "EshopInstance"
       register: all_instances
-
+    
     - name: Filter out old instances
       set_fact:
-        old_instances: "{{ all_instances.instances | selectattr('tags.DeploymentDate', 'defined') | selectattr('tags.DeploymentDate', 'lt', ansible_date_time.iso8601 | to_datetime('iso8601')) | list }}"
+        old_instances: "{{ all_instances.instances | selectattr('tags.DeploymentDate', 'defined') | list }}"
+      vars:
+        current_time: "{{ lookup('pipe', 'date -u +%s') }}"
 
     - name: Terminate old instances
       ec2_instance:
         instance_ids: "{{ item.instance_id }}"
         state: absent
       loop: "{{ old_instances }}"
-      when: old_instances | length > 0
+      when: "'DeploymentDate' in item.tags and (lookup('pipe', 'date -d' + item.tags.DeploymentDate + ' +%s') | int < current_time | int)"
