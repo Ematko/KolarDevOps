@@ -115,9 +115,8 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          mkdir -p $HOME/ansible
-          echo "$SSH_PRIVATE_KEY" | base64 -d > $HOME/ansible/test.pem
-          chmod 600 $HOME/ansible/test.pem
+          echo "$SSH_PRIVATE_KEY" | base64 -d > ./test.pem
+          chmod 400 ./test.pem
 
       - name: Install dependencies
         run: |
@@ -126,7 +125,7 @@ jobs:
 
       - name: Run Ansible Playbook
         run: |
-          ansible-playbook ansible/ec2_deploy.yml \
+          ansible-playbook ansible/ec2_deploy.yml --user ec2-user --key-file test.pem \
           -e "ansible_python_interpreter=/usr/bin/python3" \
           -e "access_key=${{ secrets.AWS_ACCESS_KEY }}" \
           -e "secret_key=${{ secrets.AWS_SECRET_KEY }}" \
