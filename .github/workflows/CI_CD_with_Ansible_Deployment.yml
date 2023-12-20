@@ -130,9 +130,3 @@ jobs:
           -e "access_key=${{ secrets.AWS_ACCESS_KEY }}" \
           -e "secret_key=${{ secrets.AWS_SECRET_KEY }}" \
           -e "session_token=${{ secrets.AWS_SESSION_TOKEN }}"  
-      
-      # - name: Deploy function
-      #   uses: lowply/deploy-firebase@v0.0.5
-      #   env:
-      #     FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-      #     FIREBASE_PROJECT: kolar-devops
