@@ -5,7 +5,7 @@
     - name: Add SSH key
       shell: |
         eval $(ssh-agent -s)
-        ssh-add /ansible/test.pem
+        ssh-add $HOME/ansible/test.pem
 
 - name: Deploy to EC2
   hosts: localhost
