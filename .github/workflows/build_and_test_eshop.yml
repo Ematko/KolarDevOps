@@ -102,6 +102,13 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
+      - name: Setup SSH Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | base64 -d > /ansible/test.pem
+          chmod 600 /ansible/test.pem
+
       - name: Load node modules and build folder
         uses: actions/cache@v3.3.2
         with:
@@ -120,7 +127,10 @@ jobs:
   
       - name: Run Ansible Playbook
         run: ansible-playbook ansible/ec2_deploy.yml -e "ansible_python_interpreter=/usr/bin/python3"
-
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
       # - name: Deploy function
       #   uses: lowply/deploy-firebase@v0.0.5
       #   env:
