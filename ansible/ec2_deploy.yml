@@ -5,8 +5,7 @@
     - name: Add SSH key
       shell: |
         eval $(ssh-agent -s)
-        ssh-add $HOME/ansible/test.pem
-        ssh-add -l
+        ssh-add ./test.pem
 
 - name: Deploy to EC2
   hosts: localhost
@@ -48,7 +47,7 @@
   connection: ssh
   vars:
       ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
-      ansible_ssh_private_key_file: $HOME/ansible/test.pem
+      ansible_ssh_private_key_file: ./test.pem
 
   tasks:
     - name: Install Git and Docker
