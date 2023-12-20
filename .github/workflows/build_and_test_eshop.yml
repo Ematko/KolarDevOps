@@ -51,7 +51,7 @@ jobs:
           path: node_modules
           key: node_modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Build
+      - name: Build app
         run: |
           npm rebuild node-sass --force
           npm run build -- --colors
@@ -102,6 +102,13 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
+      - name: Setup SSH Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" | base64 -d > /ansible/test.pem
+          chmod 600 /ansible/test.pem
+
       - name: Load node modules and build folder
         uses: actions/cache@v3.3.2
         with:
@@ -111,8 +118,21 @@ jobs:
             ./build
           key: ${{ runner.os }}-build-${{ github.run_id }}
 
-      - name: Deploy function
-        uses: lowply/deploy-firebase@v0.0.5
+      # - name: Setup Ansible
+      #   uses: dawidd6/action-ansible-playbook@v2
+      #   with:
+      #     playbook: 'ansible/ec2_deploy.yml'
+      #     directory: '.'
+      #     options: ''
+  
+      - name: Run Ansible Playbook
+        run: ansible-playbook ansible/ec2_deploy.yml -e "ansible_python_interpreter=/usr/bin/python3"
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          FIREBASE_PROJECT: kolar-devops
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      # - name: Deploy function
+      #   uses: lowply/deploy-firebase@v0.0.5
+      #   env:
+      #     FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+      #     FIREBASE_PROJECT: kolar-devops
