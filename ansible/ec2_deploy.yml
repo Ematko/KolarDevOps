@@ -1,3 +1,12 @@
+- name: Set SSH key
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Add SSH key
+      shell: |
+        eval $(ssh-agent -s)
+        ssh-add /ansible/test.pem
+
 - name: Deploy to EC2
   hosts: localhost
   connection: local
