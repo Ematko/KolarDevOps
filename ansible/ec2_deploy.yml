@@ -2,10 +2,6 @@
   hosts: localhost
   connection: local
 
-  vars:
-    tag_name: "EshopInstance"
-    environment: "Production"
-
   tasks:
     - name: Launch EC2 instance
       ec2_instance:
@@ -23,8 +19,8 @@
         aws_secret_key: "{{ secret_key }}"
         security_token: "{{ session_token }}"
         tags:
-          Name: "{{ tag_name }}"
-          Environment: "{{ environment }}"
+          Name: "EshopInstance"
+          Environment: "Production"
           DeploymentDate: "{{ ansible_date_time.iso8601 }}"
       register: ec2_instance_result
 
@@ -101,8 +97,8 @@
       ec2_instance_info:
         region: us-east-1
         filters:
-          "tag:Environment": "{{ environment }}"
-          "tag:Name": "{{ tag_name }}"
+          "tag:Environment": "Production"
+          "tag:Name": "EshopInstance"
       register: all_instances
 
     - name: Filter out old instances
