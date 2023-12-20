@@ -96,6 +96,9 @@
     - name: Find all instances
       ec2_instance_info:
         region: us-east-1
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        security_token: "{{ session_token }}"
         filters:
           "tag:Environment": "Production"
           "tag:Name": "EshopInstance"
@@ -110,3 +113,4 @@
         instance_ids: "{{ item.instance_id }}"
         state: absent
       loop: "{{ old_instances }}"
+      when: "'DeploymentDate' in item.tags and item.tags.DeploymentDate | to_datetime < ansible_date_time.iso8601 | to_datetime"
