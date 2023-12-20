@@ -106,11 +106,11 @@
 
     - name: Filter out old instances
       set_fact:
-        old_instances: "{{ all_instances.instances | selectattr('tags.DeploymentDate', 'lt', ansible_date_time.iso8601) | list }}"
+        old_instances: "{{ all_instances.instances | selectattr('tags.DeploymentDate', 'defined') | selectattr('tags.DeploymentDate', 'lt', ansible_date_time.iso8601 | to_datetime('iso8601')) | list }}"
 
     - name: Terminate old instances
       ec2_instance:
         instance_ids: "{{ item.instance_id }}"
         state: absent
       loop: "{{ old_instances }}"
-      when: "'DeploymentDate' in item.tags and item.tags.DeploymentDate | to_datetime < ansible_date_time.iso8601 | to_datetime"
+      when: old_instances | length > 0
